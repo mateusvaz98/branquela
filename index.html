@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pra Nós Dois ❤️</title>
+  <style>
+    /* ================= Animações ================= */
+    @keyframes pulse {0% { transform: scale(1); filter: drop-shadow(0 0 4px #ff4d6d);} 50% {transform: scale(1.08); filter: drop-shadow(0 0 10px #ff4d6d);} 100% {transform: scale(1); filter: drop-shadow(0 0 4px #ff4d6d);}}
+    @keyframes glow {0% { text-shadow: 0 0 5px #ff4d6d,0 0 10px #ff4d6d;} 50% { text-shadow:0 0 20px #ff4d6d,0 0 30px #ff4d6d;} 100% {text-shadow:0 0 5px #ff4d6d,0 0 10px #ff4d6d;}}
+    
+    /* ================= Fade-in ================= */
+    .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 1s ease-out, transform 1s ease-out; }
+    .fade-in.show { opacity: 1; transform: translateY(0); }
+
+    /* ================= Corpo ================= */
+    body { margin: 0; font-family: 'Poppins', sans-serif; background: radial-gradient(circle at top left, #121212, #000); color: #f2f2f2; text-align: center; overflow-x: hidden; position: relative; }
+
+    /* ================= Canvas corações ================= */
+    #heart-canvas { position: fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; background:transparent; }
+
+    /* ================= Header ================= */
+    header { padding:40px 20px; position:relative; z-index:2; }
+    h1 { font-size:2rem; color:#ff4d6d; margin-bottom:10px; animation:glow 3s infinite ease-in-out; }
+    p.sub { font-size:1rem; color:#bbb; }
+
+    /* ================= Carrossel ================= */
+    .carousel { position: relative; width: 100%; max-width: 800px; margin: 20px auto; overflow: hidden; border-radius: 15px; box-shadow:0 4px 15px rgba(255,77,109,0.3); }
+    .carousel-track { display: flex; transition: transform 0.5s ease; }
+    .carousel-track img { width: 465px; height: 540px; flex-shrink: 0; object-fit: cover; border-radius:12px; margin-right:10px; opacity:0; transform: scale(0.95); transition: transform 0.5s ease, opacity 0.5s ease; }
+    .carousel-track img.active { opacity:1; transform: scale(1); }
+
+    .carousel-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(30,30,30,0.6); color:#fff; border:none; font-size:2rem; padding:0 10px; cursor:pointer; z-index:5; border-radius:50%; }
+    .carousel-btn.prev { left:10px; }
+    .carousel-btn.next { right:10px; }
+    .carousel-btn:hover { background: rgba(30,30,30,0.9); }
+
+    @media (max-width:500px){
+      .carousel-track img { width: 90vw; height: auto; margin-right:5px; }
+    }
+
+    /* ================= Mensagem ================= */
+    .message { padding:30px 20px; max-width:700px; margin:20px auto; background: rgba(30,30,30,0.8); border-radius:20px; box-shadow:0 4px 20px rgba(255,77,109,0.2); position:relative; z-index:2; }
+
+    /* ================= Timeline ================= */
+    .timeline { margin:50px auto; max-width:600px; position:relative; z-index:2; }
+    .timeline::before { content:''; position:absolute; width:3px; background:#ff4d6d; top:0; bottom:0; left:50%; transform:translateX(-50%); }
+    .timeline-item { padding:20px; position:relative; width:50%; opacity:0; transform: translateY(20px); transition: all 0.8s ease; }
+    .timeline-item.visible { opacity:1; transform: translateY(0); }
+    .timeline-item:nth-child(odd){ left:0; }
+    .timeline-item:nth-child(even){ left:50%; }
+    .timeline-item::before { content:'❤️'; position:absolute; top:20px; right:-12px; font-size:20px; color:#ff4d6d; animation:pulse 2.5s infinite ease-in-out; }
+    .timeline-item:nth-child(even)::before{ left:-12px; }
+    .timeline-content { background:#1f1f1f; padding:15px; border-radius:12px; box-shadow:0 2px 10px rgba(255,77,109,0.3); }
+
+    @media (max-width:600px){
+      .timeline::before { left:20px; }
+      .timeline-item { width:100%; left:0 !important; padding-left:50px; }
+      .timeline-item::before { left:15px; }
+    }
+
+    /* ================= Botão ================= */
+    button { background:#ff4d6d; color:white; border:none; padding:15px 25px; border-radius:30px; font-size:1rem; cursor:pointer; transition: transform 0.3s, background 0.3s, box-shadow 0.3s; margin-bottom:60px; animation:pulse 2s infinite ease-in-out; position:relative; z-index:2; }
+    button:hover { background:#e0314b; transform:scale(1.08); box-shadow:0 0 20px rgba(255,77,109,0.6); }
+
+  </style>
+</head>
+<body>
+
+	<div id="startScreen" style="
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    background:#000;color:#fff;display:flex;align-items:center;
+    justify-content:center;flex-direction:column;z-index:100;
+  ">
+    <h1>Clique para entrar ❤️</h1>
+    <button id="startBtn" style="
+      padding:20px 40px;font-size:1.2rem;border-radius:20px;
+      background:#ff4d6d;border:none;color:white;cursor:pointer;
+      box-shadow:0 0 15px rgba(255,77,109,0.6);
+    ">Entrar</button>
+  </div>
+
+  <!-- Áudio de fundo -->
+  <audio id="bgMusic" src="audio\som.MP3" loop preload="auto"></audio>
+
+  <!-- Conteúdo da sua página -->
+  <div id="mainContent" style="opacity:0;transition:opacity 1.5s;">
+    <h1>Te amo, mandioquinha ❤️❤️</h1>
+    
+  </div>
+
+<canvas id="heart-canvas"></canvas>
+
+<header class="fade-in">
+  <h1>Branca, ainda somos nós ❤️</h1>
+  <p class="sub">Essa página é pra lembrar tudo o que ainda existe entre a gente...</p>
+</header>
+
+<!-- ================= Carrossel ================= -->
+<div class="carousel fade-in">
+  <div class="carousel-track">
+    <img src="https://i.imgur.com/xX02c9C.png" alt="Imagem 1">
+    <img src="https://i.imgur.com/veU46Ha.png" alt="Imagem 2">
+    <img src="https://i.imgur.com/A7WthDd.png" alt="Imagem 3">
+    <img src="https://i.imgur.com/GlLAvMB.png" alt="Imagem 4">
+    <img src="https://i.imgur.com/5QAkSrZ.png" alt="Imagem 5">
+    <img src="https://i.imgur.com/0wUnRQ4.png" alt="Imagem 6">
+    <img src="https://i.imgur.com/p4QBWdQ.png" alt="Imagem 7">
+    <img src="https://i.imgur.com/lPO9mFi.png" alt="Imagem 8">
+    <img src="https://i.imgur.com/tuf2TEy.png" alt="Imagem 9">
+    <img src="https://i.imgur.com/la8xO5T.png" alt="Imagem 10">
+    <img src="https://i.imgur.com/1GDHCsZ.png" alt="Imagem 11">
+  </div>
+  <button class="carousel-btn prev">‹</button>
+  <button class="carousel-btn next">›</button>
+</div>
+
+<div class="message fade-in">
+  <p>Branca, a gente viveu muita coisa linda, e o que a gente tem é raro.  
+  Eu só quero uma chance de mostrar que posso ser melhor, por nós.  
+  Te amo — e espero que essa página te lembre de cada sorriso, cada abraço, cada olhar. 💞</p>
+</div>
+
+<div class="timeline fade-in">
+  <div class="timeline-item"><div class="timeline-content">Nosso primeiro encontro — o começo de tudo 💫</div></div>
+  <div class="timeline-item"><div class="timeline-content">As risadas que só a gente entende 😄</div></div>
+  <div class="timeline-item"><div class="timeline-content">As promessas, os sonhos, o amor verdadeiro ❤️</div></div>
+</div>
+
+<button onclick="showLove()">Me dá mais uma chance ❤️</button>
+
+<!-- Música de fundo HTML5 -->
+<audio id="bgMusic" src="https://www.youtube.com/embed/rtOvBOTyX00" autoplay loop></audio>
+
+<script>
+  // ================= Corações caindo =================
+  const canvas = document.getElementById('heart-canvas');
+  const ctx = canvas.getContext('2d');
+  let hearts = [];
+  const colors = ['#ff4d6d', '#ff6b81', '#ffb3c1'];
+  const maxHearts = 50;
+
+    
+
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function createHeart() {
+    if(hearts.length < maxHearts) hearts.push({
+      x: Math.random()*canvas.width,
+      y: -10,
+      size: Math.random()*16+8,
+      speed: Math.random()*1.5+0.5,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      drift: (Math.random()-0.5)*1,
+      opacity: Math.random()*0.5+0.3
+    });
+  }
+
+  function drawHeart(x,y,size,color,opacity){
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.bezierCurveTo(-size/2,-size/2,-size,size/3,0,size);
+    ctx.bezierCurveTo(size,size/3,size/2,-size/2,0,0);
+    ctx.fillStyle = color + Math.floor(opacity*255).toString(16);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function animate() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    createHeart();
+    hearts.forEach((h,i)=>{
+      h.y+=h.speed;
+      h.x+=h.drift;
+      drawHeart(h.x,h.y,h.size,h.color,h.opacity);
+      if(h.y>canvas.height+20) hearts.splice(i,1);
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  // ================= Fade-in cinematográfico =================
+  window.addEventListener('load', ()=>{
+    const fadeElements = document.querySelectorAll('.fade-in');
+    fadeElements.forEach((el,index)=>{
+      setTimeout(()=>{ el.classList.add('show'); }, index*500);
+    });
+  });
+
+  // ================= Botão =================
+  function showLove(){ alert('Te amo, Branca ❤️'); }
+
+  // ================= Carrossel =================
+  const track = document.querySelector('.carousel-track');
+  const slides = Array.from(track.children);
+  const prevButton = document.querySelector('.carousel-btn.prev');
+  const nextButton = document.querySelector('.carousel-btn.next');
+  let currentIndex = 0;
+
+  function updateActiveSlide(){
+    slides.forEach(s => s.classList.remove('active'));
+    slides[currentIndex].classList.add('active');
+  }
+
+  nextButton.addEventListener('click', ()=>{
+    currentIndex = (currentIndex+1)%slides.length;
+    const slideWidth = slides[0].getBoundingClientRect().width + 10;
+    track.style.transform = 'translateX(-'+(slideWidth*currentIndex)+'px)';
+    updateActiveSlide();
+  });
+
+  prevButton.addEventListener('click', ()=>{
+    currentIndex = (currentIndex-1+slides.length)%slides.length;
+    const slideWidth = slides[0].getBoundingClientRect().width + 10;
+    track.style.transform = 'translateX(-'+(slideWidth*currentIndex)+'px)';
+    updateActiveSlide();
+  });
+
+  setInterval(()=>{ nextButton.click(); }, 4000);
+
+   const startBtn = document.getElementById('startBtn');
+    const startScreen = document.getElementById('startScreen');
+    const music = document.getElementById('bgMusic');
+    const mainContent = document.getElementById('mainContent');
+
+    startBtn.addEventListener('click', async () => {
+      startScreen.style.display = 'none'; // esconde tela inicial
+      mainContent.style.opacity = 1; // mostra o conteúdo com fade-in
+      try {
+        await music.play(); // tenta tocar o som
+        console.log("🎵 Música tocando!");
+      } catch (err) {
+        console.log("⚠️ Erro ao tocar música:", err);
+      }
+    });
+
+  // ================= Timeline aparecer ao rolar =================
+  const timelineItems = document.querySelectorAll('.timeline-item');
+  window.addEventListener('scroll', ()=>{
+    const triggerBottom = window.innerHeight*0.85;
+    timelineItems.forEach(item=>{
+      const itemTop = item.getBoundingClientRect().top;
+      if(itemTop < triggerBottom) item.classList.add('visible');
+    });
+  });
+
+
+</script>
+</body>
+</html>
